@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-char * getBoardInput(char *board, size_t *size, size_t *capacity, char ch)
+char * getBoardInput(char *board, int *size, int *capacity, char ch)
 {
 
     if (*size >= *capacity - 1)
@@ -86,8 +86,8 @@ int main()
     int col = 0;
     int row = 0;
     int colNum = 0;
-    size_t capacity = 100;
-    size_t size = 0;
+    int capacity = 100;
+    int size = 0;
     printf("Enter game board:\n");
     while (1)
     {
@@ -140,6 +140,5 @@ int main()
         printf("\n");
     }
     free(board);
-
     return 0;
 }
