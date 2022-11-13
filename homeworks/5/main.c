@@ -1,37 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include <string.h>
+#include <stdbool.h>
 #define MAX_STRING_LENGTH 200
 typedef struct Points {
     double x;
     double y;
 } point;
-
-void stripString(char * s) {
-    char * d = s;
-    int inSpaces = 1;
-    int howManyTimesWeChangedD = 0;
-    while (*s) {
-        if (inSpaces) {
-            if (*s != ' ') {
-                inSpaces = 0;
-                *d ++ = *s ++;
-                howManyTimesWeChangedD++;
-            } else {
-                 s ++;
-            }
-        } else {
-            if (*s == ' ') {
-                inSpaces = 1;
-            }
-            *d ++ = *s ++;
-            howManyTimesWeChangedD ++;
-        }
-    }
-    if (howManyTimesWeChangedD > 0 && inSpaces) d --;
-    *d = '\0';
-}
-
 
 void getPlaneInput(double ** coordinates, point coordinate, char *** names, char * name, size_t *size, size_t *capacity) 
 {
@@ -54,8 +30,8 @@ void getPlaneInput(double ** coordinates, point coordinate, char *** names, char
     // printf("coordinate assigning\n");
     // printf("on size %lu\n", *size);
     
-    (*coordinates)[*size*2] = coordinate.x;
-    (*coordinates)[*size*2+1]=coordinate.y;
+    (*coordinates)[(*size)*2] = coordinate.x;
+    (*coordinates)[(*size)*2+1]=coordinate.y;
 
     // printf("coordinate assigned\n");
 
@@ -66,6 +42,20 @@ void getPlaneInput(double ** coordinates, point coordinate, char *** names, char
     (*names)[*size][i] = '\0';
     (*size)++;
     return;
+}
+double computeDistance(double x1, double y1, double x2, double y2) {
+    return sqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1));
+}
+void freeEveryMemory(double ** coordinates, char *** names, size_t capacity) {
+    free(*coordinates);
+    for(int i = 0; i < capacity; i++) {
+        free((*names)[i]);
+    }
+    free(*names);
+    return;
+}
+bool essentiallyEqual(double a, double b) {
+    return fabs(a - b) <= ( (fabs(a) > fabs(b) ? fabs(b) : fabs(a)) * (__DBL_EPSILON__ * 1000));
 }
 
 int main()
@@ -82,22 +72,76 @@ int main()
     printf("Plane coordinates:\n");
     while (1)
     {
-        int x = scanf("%lf , %lf : %199s", &tmpPoint.x, &tmpPoint.y, tmpName);
+        char comma, colon;
+        int x = scanf(" %lf %c %lf %c %199s", &tmpPoint.x, &comma, &tmpPoint.y, &colon, tmpName);
+        if(comma != ',' || colon != ':') {
+            printf("Invalid input.\n");
+            freeEveryMemory(&coordinates, &names, capacity);
+            return 0;
+        }
+        if(x != 5 && x != EOF) {
+            printf("Invalid input.\n");
+            freeEveryMemory(&coordinates, &names, capacity);
+            return 0;
+        }
         if(x == EOF) {
             break;
         }
-        // stripString(tmpName);
+      
         getPlaneInput(&coordinates, tmpPoint, &names, tmpName, &size, &capacity);
     }
-    for(size_t i = 0; i < size; i++) {
-        printf("%lf %lf\n ", coordinates[i*2], coordinates[i*2+1]);
-        char * pls = names[i];
-        
-        while(*pls) {
-            printf("%c", *pls ++);
-        }
-        printf("\n");
+    if(size < 2) {
+        printf("Invalid input.\n");
+        freeEveryMemory(&coordinates, &names, capacity);
+        return 0;
     }
+
+    double minDistance = __DBL_MAX__;
+    for(int i = 0; i < size; i=i+1) {
+        for(int j = i + 1; j < size; j=j+1) {
+            double distance = computeDistance(coordinates[i*2], coordinates[i*2+1], coordinates[j*2], coordinates[j*2+1]);
+            if(minDistance > distance) {
+                minDistance = distance;
+            }
+        }
+    }
+    printf("Minimum airplane distance: %lf\n", minDistance);
+    int pairMaxSize = (size - 1) * ((size - 1) + 1) / 2;
+    int * pairTable = (int *) malloc(pairMaxSize * 2 * sizeof(int));
+    size_t it = 0;
+ 
+    for(int i = 0; i < size; i=i+1) {
+        for(int j = i + 1; j < size; j=j+1) {
+            double distance = computeDistance(coordinates[i*2], coordinates[i*2+1], coordinates[j*2], coordinates[j*2+1]);
+            if(essentiallyEqual(distance, minDistance)) {
+                pairTable[it] = i;
+                pairTable[it+1] = j;
+                it = it + 2;
+            }
+        }
+    }
+    printf("Pairs found: %lu\n", it / 2);
+    for(int i = 0; i < size; i=i+1) {
+        for(int j = i + 1; j < size; j=j+1) {
+            double distance = computeDistance(coordinates[i*2], coordinates[i*2+1], coordinates[j*2], coordinates[j*2+1]);
+            if(essentiallyEqual(distance, minDistance)) {
+                char * str1 = names[i];
+                char * str2 = names[j];
+                while(*str1) {
+                    printf("%c", *str1 ++);
+                } 
+                printf(" - ");
+                while(*str2) {
+                    printf("%c", *str2 ++);
+                }
+                printf("\n");
+               
+            }
+        }
+    }
+     
+    freeEveryMemory(&coordinates, &names, capacity);
+    free(pairTable);
     
-    return 0;
+    return 1;
 }
