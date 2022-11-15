@@ -87,7 +87,6 @@ double stripClosest(point *strip, int size, double d) {
                 min = computeDistance(strip[i], strip[j]);
         }
     }
-    printf("strip array > ");
     for(int i = 0; i < size; i++) {
         printf(" (%lf , %lf)\n", strip[i].x, strip[i].y);
     }
@@ -139,6 +138,7 @@ int main()
     size_t size = 0;
     size_t capacity = 100;
     printf("Plane coordinates:\n");
+    // ccommennts
     while (1)
     {
         char comma, colon;
