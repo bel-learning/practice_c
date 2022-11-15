@@ -8,15 +8,9 @@ typedef struct Points
 {
     double x;
     double y;
-    double dis_from_origin;
     size_t index;
 } point;
-int myCmp(const void *a, const void *b)
-{
-    point *point1 = (point *)a;
-    point *point2 = (point *)b;
-    return (point1->dis_from_origin - point2->dis_from_origin);
-}
+
 void getPlaneInput(point **coordinates, point coordinate, char ***names, char *name, size_t *size, size_t *capacity)
 {
     // printf("%lf %lf\n", coordinate.x, coordinate.y);
@@ -52,7 +46,7 @@ void getPlaneInput(point **coordinates, point coordinate, char ***names, char *n
 }
 double computeDistance(point a, point b)
 {
-    return sqrt((b.x - a.x) * (b.x - a.x) + (b.y - a.x) * (b.y - a.x));
+    return sqrt((b.x - a.x) * (b.x - a.x) + (b.y - a.y) * (b.y - a.y));
 }
 void freeEveryMemory(point **coordinates, char ***names, size_t capacity)
 {
@@ -85,50 +79,52 @@ double min(double x, double y)
 }
 double stripClosest(point *strip, int size, double d) {
     double min = d;
-    for(int i = 0; i < size; i++) {
-        for(int j = i +1; j < size && (strip[j].y - strip[i].y) < min; ++j) {
-            min = computeDistance(strip[i], strip[j]);
-        }
-    } 
-    return min;
-}
-double closestUtil(point * points_x, point * points_y, size_t n) {
-    size_t mid = n /2;
-    point mid_point = points_x[mid];
+    qsort(strip, size, sizeof(point), compareY);
 
-    point pyl[mid];
-    point pyr[n-mid];
-    int li = 0, ri = 0;
-    for(int i = 0; i < n; i++) {
-        if((points_y[i].x < mid_point.x) || (points_y[i].x == mid_point.x && points_y[i].y < mid_point.y) && (li < mid)) {
-            pyl[li++]=points_y[i];
-        }
-        else {
-            pyr[ri++]=points_y[i];
+    for(int i = 0; i < size; ++i) {
+        for(int j = i +1; j < size && (strip[j].y - strip[i].y) < min; ++j) {
+            if(computeDistance(strip[i], strip[j]))
+                min = computeDistance(strip[i], strip[j]);
         }
     }
-    double dl = closestUtil(points_x, pyl, mid);
-    double dr = closestUtil(points_x + mid, pyr, n-mid);    
+    for(int i = 0; i < size; i++) {
+        printf(" (%lf , %lf)\n", strip[i].x, strip[i].y);
+    }
+    return min;
+}
+double bruteForce(point * p, size_t n)
+{
+    double min = __DBL_MAX__;
+    for (size_t i = 0; i < n; i++)
+        for (size_t j = i+1; j < n; j++)
+            if (computeDistance(p[i], p[j]) < min)
+                min = computeDistance(p[i], p[j]);
+    return min;
+}
+double closestUtil(point * points, size_t n) {
+    if (n <= 3)
+        return bruteForce(points, n);
+    size_t mid = n /2;
+    point mid_point = points[mid];
+   
+    double dl = closestUtil(points, mid);
+    double dr = closestUtil(points + mid, n-mid);    
     double d = min(dl, dr);
+
     point strip[n];
     int j =0;
     for(int i = 0; i < n; i++) {
-        if(fabs(points_y[i].x - mid_point.x) < d) {
-            strip[j] = points_y[i], j++;
+        if(fabs(points[i].x - mid_point.x) < d) {
+            strip[j] = points[i], j++;
         }
     }
-    return stripClosest(strip, j, d);
+    printf("d-> %lf\n", d);
+    printf("strip -> %lf\n", stripClosest(strip,j, d));
+    return min(d,stripClosest(strip,j,d));
 }
 double findClosest(point * points, size_t n) {
-    point points_x[n];
-    point points_y[n];
-    for(int i = 0; i < n; i++){
-        points_x[i] = points[i];
-        points_y[i] = points[i];
-    }
-    qsort(points_x, n, sizeof(point), compareX);
-    qsort(points_y, n, sizeof(point), compareY);
-    return closestUtil(points_x, points_y, n);
+    qsort(points, n, sizeof(point), compareX);
+    return closestUtil(points, n);
 }
 int main()
 {
@@ -138,13 +134,11 @@ int main()
         names[i] = (char *)malloc((MAX_STRING_LENGTH + 1) * sizeof(char));
 
     point tmpPoint;
-    point zeroPoint;
-    zeroPoint.x = 0;
-    zeroPoint.y = 0;
     char tmpName[MAX_STRING_LENGTH];
     size_t size = 0;
     size_t capacity = 100;
     printf("Plane coordinates:\n");
+    // ccommennts
     while (1)
     {
         char comma, colon;
@@ -166,7 +160,6 @@ int main()
             break;
         }
         tmpPoint.index = size;
-        tmpPoint.dis_from_origin = computeDistance(tmpPoint, zeroPoint);
         getPlaneInput(&coordinates, tmpPoint, &names, tmpName, &size, &capacity);
     }
     if (size < 2)
@@ -178,49 +171,7 @@ int main()
     // qsort(coordinates, size, sizeof coordinates[0], myCmp);
     double minDis = findClosest(coordinates, size);
     printf("min dis: %lf\n", minDis);
-    // for(int i = 0; i < size; i=i+1) {
-    //     for(int j = i + 1; j < size; j=j+1) {
-    //         double distance = computeDistance(coordinates[i].x, coordinates[i].y, coordinates[j].x, coordinates[j].y);
-    //         if(minDistance > distance) {
-    //             minDistance = distance;
-    //         }
-    //     }
-    // }
-    // printf("Minimum airplane distance: %lf\n", minDistance);
-    // int pairMaxSize = (size - 1) * ((size - 1) + 1) / 2;
-    // int * pairTable = (int *) malloc(pairMaxSize * 2 * sizeof(int));
-    // size_t it = 0;
-
-    // for(int i = 0; i < size; i=i+1) {
-    //     for(int j = i + 1; j < size; j=j+1) {
-    //         double distance = computeDistance(coordinates[i*2], coordinates[i*2+1], coordinates[j*2], coordinates[j*2+1]);
-    //         if(essentiallyEqual(distance, minDistance)) {
-    //             pairTable[it] = i;
-    //             pairTable[it+1] = j;
-    //             it = it + 2;
-    //         }
-    //     }
-    // }
-    // printf("Pairs found: %lu\n", it / 2);
-    // for(int i = 0; i < size; i=i+1) {
-    //     for(int j = i + 1; j < size; j=j+1) {
-    //         double distance = computeDistance(coordinates[i*2], coordinates[i*2+1], coordinates[j*2], coordinates[j*2+1]);
-    //         if(essentiallyEqual(distance, minDistance)) {
-    //             char * str1 = names[i];
-    //             char * str2 = names[j];
-    //             while(*str1) {
-    //                 printf("%c", *str1 ++);
-    //             }
-    //             printf(" - ");
-    //             while(*str2) {
-    //                 printf("%c", *str2 ++);
-    //             }
-    //             printf("\n");
-
-    //         }
-    //     }
-    // }
-
+    
     freeEveryMemory(&coordinates, &names, capacity);
     // free(pairTable);
 
