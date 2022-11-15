@@ -2,6 +2,10 @@
 
 tests/
 
+main
+a.out
+test.c
+
 **/**/**/main
 **/**/**/a.out
 
