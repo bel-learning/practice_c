@@ -16,10 +16,9 @@ typedef struct Pairs
     size_t i2;
     double value;
 } pair;
-
+// Few global variables in order to avoid annoying stuff.
 size_t pStoreSize = 0;
 size_t pStoreCapacity = 1000;
-double latestMin = __DBL_MAX__;
 void getPlaneInput(point **coordinates, point coordinate, char ***names, char *name, size_t *size, size_t *capacity)
 {
     if (*size >= (*capacity))
@@ -107,7 +106,6 @@ int compareY(const void *a, const void *b)
 }
 void storeInPair(pair **pairStorage, size_t ind1, size_t ind2, double value)
 {
-    // printf("val: %lf\n", value);
     if (pStoreSize >= pStoreCapacity)
     {
         pStoreCapacity *= 2;
@@ -160,7 +158,6 @@ double bruteForce(point *p, size_t n, pair **pairStorage)
         for (size_t j = i + 1; j < n; j++)
         {
             double tmp = computeDistance(p[i], p[j]);
-            // printf("%lu %lu %lf\n", p[i].index, p[j].index, tmp);
             if (essentiallyEqual(tmp, min))
             {
                 storeInPair(pairStorage, p[i].index, p[j].index, tmp);
@@ -169,7 +166,6 @@ double bruteForce(point *p, size_t n, pair **pairStorage)
             {
                 min = tmp;
                 storeInPair(pairStorage, p[i].index, p[j].index, tmp);
-                latestMin = fmin(min, latestMin);
             }
         }
     }
@@ -188,6 +184,7 @@ double closestUtil(point *Px, point *Py, size_t n, pair **pairStorage)
     point *Pyr = (point *) malloc(n * sizeof(*Pyr));
 
     size_t li = 0, ri = 0;
+    // Filtering to left and right
     for (size_t i = 0; i < n; i++)
     {
         if ((Py[i].x < mid_point.x || (Py[i].x == mid_point.x && Py[i].y < mid_point.y)) && li < mid)
@@ -200,7 +197,6 @@ double closestUtil(point *Px, point *Py, size_t n, pair **pairStorage)
     double d = fmin(dl, dr);
     point *strip = (point *)malloc(n * sizeof(*strip));
     size_t j = 0;
-    // essentiallyEqual(d, fabs(Py[i].x - mid_point.x))
     for (size_t i = 0; i < n; i++)
     {
         if (fabs(Py[i].x - mid_point.x) <= d || essentiallyEqual(d, fabs(Py[i].x - mid_point.x)))
@@ -232,7 +228,6 @@ double findClosest(point *P, size_t n, pair **pairStorage)
     free(Py);
 
     return min;
-    // return 1.0;
 }
 int main()
 {
@@ -245,7 +240,7 @@ int main()
     size_t size = 0;
     size_t capacity = 100;
     printf("Plane coordinates:\n");
-    // ccommennts
+    // Input starts here
     while (1)
     {
         char comma, colon;
@@ -269,28 +264,32 @@ int main()
         tmpPoint.index = size;
         getPlaneInput(&coordinates, tmpPoint, &names, tmpName, &size, &capacity);
     }
+    // Invalid input checking
     if (size < 2)
     {
         printf("Invalid input.\n");
         freeEveryMemory(&coordinates, &names, capacity);
         return 0;
     }
-    // qsort(coordinates, size, sizeof coordinates[0], myCmp);
+    // For storing pair during the algorithm
     pair *pairStorage = (pair *)malloc(pStoreCapacity * sizeof(*pairStorage));
+    // Min dis found
     double minDis = findClosest(coordinates, size, &pairStorage);
+    
     printf("Minimum airplane distance: %lf\n", (minDis));
-    size_t cnt = 0;
-    // sort the pairs;
-
     qsort(pairStorage, pStoreSize, sizeof(pair), compareX);
 
+// Pushing 1 more DUMMY Value to the Array in order to make looping better.
+// When checking i == i + 1 it opens itself to edge cases.
+// Adding 1 more dummy element would keep in check of that
     storeInPair(&pairStorage, __LONG_MAX__, __LONG_MAX__, -1);
+
+    size_t cnt = 0;
 
     pair *validPairs = (pair *)malloc(pStoreCapacity * sizeof(*validPairs));
 
     for (size_t i = 0; i < pStoreSize - 1; i++)
     {
-        // printf("%lu %lu %lf\n", pairStorage[i].i1, pairStorage[i].i2, pairStorage[i].value);
         if (essentiallyEqual(pairStorage[i].value, minDis))
         {
             if (!((pairStorage[i].i1 == pairStorage[i + 1].i1 && pairStorage[i].i2 == pairStorage[i + 1].i2) ||
@@ -303,7 +302,6 @@ int main()
     printf("Pairs found: %lu\n", cnt);
     for (size_t i = 0; i < cnt; i++)
     {
-        // printf("working: %lu\n", i);
         printf("%s - %s\n", names[validPairs[i].i1], names[validPairs[i].i2]);
     }
     freeEveryMemory(&coordinates, &names, capacity);
