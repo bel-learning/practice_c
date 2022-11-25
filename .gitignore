@@ -22,7 +22,9 @@ test.c
 
 **/**/main
 **/**/a.out
-
+other/
+a.out.dSYM/
+test.*
 .DS_Store
 **/.DS_Store
 **/**/.DS_Store
