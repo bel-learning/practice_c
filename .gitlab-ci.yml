@@ -1,0 +1,28 @@
+image: gitlab.fit.cvut.cz:5000/ict/alpine-docker-images/base:edge
+
+before_script:
+    - apk add build-base
+
+test_all:
+  stage: test
+  script: 
+    - >
+      for hw_dir in homeworks/*
+      do
+          cd "$hw_dir";
+          echo "Test $hw_dir";
+          if test -f ./main.c;
+          then
+              g++ -w main.c;
+          fi
+          if test -f ./main.cpp;
+          then g++ -w main.cpp;
+          fi
+
+          if test -f ./test.sh;
+          then
+              ./test.sh;
+          fi
+          cd ../..;
+      done
+          
