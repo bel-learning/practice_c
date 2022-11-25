@@ -136,7 +136,7 @@ int main () {
             addToList(&toBuyArray, tmpItem, &toBuySize, &toBuyCapacity);
         }
     }
-    qsort()
+    // qsort()
     printShelf(arrShelf, shelfNum+1);
 } 
 
