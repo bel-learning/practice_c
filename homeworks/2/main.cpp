@@ -49,7 +49,6 @@ int CheckPrimeSumDivisor(int num) {
 
     int power2 = 0;
     int base2 = 1;
-    
     while (n % 2 == 0)
     {
         n = n/2;
@@ -170,6 +169,7 @@ void computePrimes(int n) {
             }
         }
     }
+   
 }
 int main() {
     char ch;
@@ -198,9 +198,3 @@ int main() {
     
     return 0;
 }
-
-
-// 3000000 - 4000000;
-// 1500000 - 2000000 => 15000000 = [2, 4, 5, 6]->add (2) (3000000) ;
-// even set of 3000000 - 4000000;
-// increment the program with i = i + 2;
