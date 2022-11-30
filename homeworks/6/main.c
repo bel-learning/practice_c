@@ -35,6 +35,18 @@ void removeNL(char *s);
 void printShelf(Shelf *arrShelf, size_t len);
 void printList(List *arr, size_t len);
 
+int compareStr(const void *a, const void *b)
+{
+    Item *s1 = (Item *)a, *s2 = (Item *)b;
+    if (strcmp(s1->str, s2->str) > 0)
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
+}
 
 void expandShelf(Shelf **arrShelf, size_t *shelfSize, size_t *shelfCap, size_t num)
 {
@@ -48,10 +60,6 @@ void expandShelf(Shelf **arrShelf, size_t *shelfSize, size_t *shelfCap, size_t n
             (*arrShelf)[i].capacity = 100;
             (*arrShelf)[i].num = 0;
             (*arrShelf)[i].items = (Item *)malloc((*arrShelf)[i].capacity * sizeof(Item));
-            for(size_t j = 0; j < (*arrShelf)[i].capacity; j++) {
-                (*arrShelf)[i].items[j].capacity = 100;
-                (*arrShelf)[i].items[j].str = (char *) malloc((*arrShelf)[i].items[j].capacity);
-            }
         }
     }
     (*arrShelf)[*shelfSize].num = num;
@@ -65,16 +73,11 @@ void addToShelf(Shelf **arrShelf, size_t shelfSize, Item item)
     {
         (*arrShelf)[shelfNum].capacity *= 2;
         (*arrShelf)[shelfNum].items = (Item *)realloc(((*arrShelf)[shelfNum].items), ((*arrShelf)[shelfNum].capacity) * sizeof(Item));
-        for(size_t j = 0; j < (*arrShelf)[shelfNum].capacity; j++) {
-                (*arrShelf)[shelfNum].items[j].capacity = 100;
-                (*arrShelf)[shelfNum].items[j].str = (char *) malloc((*arrShelf)[shelfNum].items[j].capacity);
-        }
     }
-    (*arrShelf)[shelfNum].items[(*arrShelf)[shelfNum].size].capacity = item.capacity + 1;
+    (*arrShelf)[shelfNum].items[(*arrShelf)[shelfNum].size].capacity = item.capacity;
     (*arrShelf)[shelfNum].items[(*arrShelf)[shelfNum].size].len = item.len;
     (*arrShelf)[shelfNum].items[(*arrShelf)[shelfNum].size].found = item.found;
-    (*arrShelf)[shelfNum].items[(*arrShelf)[shelfNum].size].str = 
-    (char *)realloc((*arrShelf)[shelfNum].items[(*arrShelf)[shelfNum].size].str,item.capacity);
+    (*arrShelf)[shelfNum].items[(*arrShelf)[shelfNum].size].str = (char *)malloc(item.capacity * sizeof(char));
 
     strcpy((*arrShelf)[shelfNum].items[(*arrShelf)[shelfNum].size].str, item.str);
     // free(item)
@@ -94,10 +97,6 @@ void expandList(List **arrList, size_t *size, size_t *capacity)
             (*arrList)[i].capacity = 100;
             (*arrList)[i].size = 0;
             (*arrList)[i].items = (Item *)malloc((*arrList)[i].capacity * sizeof(Item));
-            for(size_t j = 0; j < (*arrList)[i].capacity; j++) {
-                (*arrList)[i].items[j].capacity = 100;
-                (*arrList)[i].items[j].str = (char *) malloc((*arrList)[i].items[j].capacity);
-            }
         }
     }
     (*size)++;
@@ -112,10 +111,10 @@ void addToList(List **arrList, Item item, size_t *size)
         (*arrList)[index].capacity *= 2;
         (*arrList)[index].items = (Item *)realloc((*arrList)[index].items, (*arrList)[index].capacity * sizeof(Item));
     }
-    (*arrList)[index].items[(*arrList)[index].size].capacity = item.capacity + 1;
+    (*arrList)[index].items[(*arrList)[index].size].capacity = item.capacity;
     (*arrList)[index].items[(*arrList)[index].size].len = item.len;
     (*arrList)[index].items[(*arrList)[index].size].found = item.found;
-    (*arrList)[index].items[(*arrList)[index].size].str = (char *)realloc((*arrList)[index].items[(*arrList)[index].size].str, item.capacity);
+    (*arrList)[index].items[(*arrList)[index].size].str = (char *)malloc(item.capacity * sizeof(char));
 
     strcpy((*arrList)[index].items[(*arrList)[index].size].str, item.str);
 
@@ -126,23 +125,26 @@ void freeMemory(Shelf **arrShelf, size_t shelfSize, size_t shelfCap, List **arrL
 {
     for (size_t i = 0; i < shelfCap; i++)
     {
-        // printf("Freeing str\n");
-            for (size_t j = 0; j < (*arrShelf)[i].capacity; i++)
+        // if (i < shelfSize)
+        // {
+            for (size_t j = 0; j < (*arrShelf)[i].size; j++)
             {
-                // printf("freeing: %lu %lu\n",j, (*arrShelf)[i].capacity);
                 free((*arrShelf)[i].items[j].str);
             }
-        // printf("Done\n");
-
+        // }
         free((*arrShelf)[i].items);
     }
     free(*arrShelf);
     for (size_t i = 0; i < listCapacity; i++)
     {
-            for (size_t j = 0; j < (*arrList)[i].capacity; i++)
+        // if (i < listSize)
+        // {
+            for (size_t j = 0; j < (*arrList)[i].size; j++)
             {
                 free((*arrList)[i].items[j].str);
             }
+        // }
+
         free((*arrList)[i].items);
     }
     free(*arrList);
@@ -248,10 +250,6 @@ int main()
         arrShelf[i].size = 0;
         arrShelf[i].num = 0;
         arrShelf[i].items = (Item *)malloc(arrShelf[i].capacity * sizeof(Item));
-        for(size_t j = 0; j < arrShelf[i].capacity; j++) {
-            arrShelf[i].items[j].capacity = 100;
-            arrShelf[i].items[j].str = (char *) malloc(arrShelf[i].items[j].capacity);
-        }
     }
 
     size_t listSize = 0;
@@ -262,10 +260,6 @@ int main()
         arrList[i].capacity = listCapacity;
         arrList[i].size = 0;
         arrList[i].items = (Item *)malloc(arrList[i].capacity * sizeof(Item));
-        for(size_t j = 0; j < arrList[i].capacity; j++) {
-            arrList[i].items[j].capacity = 100;
-            arrList[i].items[j].str = (char *) malloc(arrList[i].items[j].capacity);
-        }
     }
 
     char *str = NULL;
