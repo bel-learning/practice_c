@@ -12,46 +12,23 @@ int op = 0;
 int search(int size, int *w, int ws, int *n, int ns, int *e, int es, int *s, int ss, int a, int b, int aTurn) {
     op++;
     if(size == 0) {
-        // printf("a - %d b - %d\n", a,b);
-        // printf("Finished searching\n");
-        return maxInt(a, b);
+        printf("a - %d b - %d\n", a,b);
+        printf("Finished searching\n");
+        return 0;
     }
     if(aTurn) {
-        int max = INT32_MIN;
-        if(ws != 0) 
-            max = maxInt(max, search(size-1, w+1, ws-1, n, ns, e, es, s, ss, a + w[0], b, 0));
-        
-        if(ns != 0) 
-            max = maxInt(max,search(size-1, w, ws, n+1, ns-1, e, es, s, ss, a + n[0], b, 0));
-        
-        if(es != 0) 
-            max = maxInt(max,search(size-1, w, ws, n, ns, e+1, es-1, s, ss, a + e[0], b, 0));
-        
-        if(ss != 0) 
-            max = maxInt(max,search(size-1, w, ws, n, ns, e, es, s+1, ss-1, a + s[0], b, 0));
-        printf("max in A turn: %d\n", max);
-        return max;
+        return 
+        ((ws != 0) && search(size-1, w+1, ws-1, n, ns, e, es, s, ss, a + w[0], b, 0)) ||
+        ((ns != 0) && search(size-1, w, ws, n+1, ns-1, e, es, s, ss, a + n[0], b, 0)) ||
+        ((es != 0) && search(size-1, w, ws, n, ns, e+1, es-1, s, ss, a + e[0], b, 0)) ||
+        ((ss != 0) && search(size-1, w, ws, n, ns, e, es, s+1, ss-1, a + s[0], b, 0));
     }
     else {
-        int max = INT32_MIN;
-        if(ws != 0) 
-            max = maxInt(max, search(size-1, w+1, ws-1, n, ns, e, es, s, ss, a , b + w[0], 1));
-        
-        if(ns != 0) 
-            max = maxInt(max,search(size-1, w, ws, n+1, ns-1, e, es, s, ss, a , b + n[0], 1));
-        
-        if(es != 0) 
-            max = maxInt(max,search(size-1, w, ws, n, ns, e+1, es-1, s, ss, a , b + e[0], 1));
-        
-        if(ss != 0) 
-            max = maxInt(max,search(size-1, w, ws, n, ns, e, es, s+1, ss-1, a , b + s[0], 1));
-        printf("max in B turn: %d\n", max);
-        return max;
-        // return 
-        // ((ws != 0) && search(size-1, w+1, ws-1, n, ns, e, es, s, ss, a, b + w[0], 1)) ||
-        // ((ns != 0) && search(size-1, w, ws, n+1, ns-1, e, es, s, ss, a, b + n[0], 1)) ||
-        // ((es != 0) && search(size-1, w, ws, n, ns, e+1, es-1, s, ss, a, b + e[0], 1)) ||
-        // ((ss != 0) && search(size-1, w, ws, n, ns, e, es, s+1, ss-1, a, b + s[0], 1));
+        return 
+        ((ws != 0) && search(size-1, w+1, ws-1, n, ns, e, es, s, ss, a, b + w[0], 1)) ||
+        ((ns != 0) && search(size-1, w, ws, n+1, ns-1, e, es, s, ss, a, b + n[0], 1)) ||
+        ((es != 0) && search(size-1, w, ws, n, ns, e+1, es-1, s, ss, a, b + e[0], 1)) ||
+        ((ss != 0) && search(size-1, w, ws, n, ns, e, es, s+1, ss-1, a, b + s[0], 1));
     }
 }
 
