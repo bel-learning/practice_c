@@ -1,12 +1,15 @@
-#include<stdio.h>
-#include<stdlib.h>
-#include<stdbool.h>
-#include<ctype.h>
-typedef struct {
-    int * arr;
-    size_t size;
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <string.h>
+#include <ctype.h>
+typedef struct
+{
+    int *arr;
+    int size;
 } ArrayWithSize;
-typedef struct {
+typedef struct
+{
     int a;
     int b;
     int answer[128][2];
@@ -34,10 +37,11 @@ twoValue search(ArrayWithSize * tokens, size_t size, int a, int b, int aTurn, in
             printf("%d %d\n", answer[i][0], answer[i][1]);
         }
         return ab;
-        // return 0;
     }
-    if(aTurn) {
+    if (aTurn)
+    {
         twoValue arr[4];
+        twoValue dir[4];
         int cnt = 0;
         // copy tokens into tmp->
         twoValue max;
@@ -90,8 +94,76 @@ twoValue search(ArrayWithSize * tokens, size_t size, int a, int b, int aTurn, in
     }
 }
 
-int main() {
-   
+int insertArray(char *str, bool *colon, bool *brace1, bool *brace2, ArrayWithSize *tokens, int direction, int *index)
+{
+    str++;
+    while (*str)
+    {
+        // printf(">%c<\n", *str);
+        if (*str == ' ')
+        {
+            str++;
+            continue;
+        }
+        if (*str == ':')
+        {
+            (*colon) = true;
+            str++;
+            continue;
+        }
+        if (*str == '{')
+        {
+            (*brace1) = true;
+            str++;
+            continue;
+        }
+        if (isdigit(*str) || *str == '-')
+        {
+            // hopefully number won't be higher than 100 digits lmao
+            char *numStr = (char *)malloc(100);
+            int cnt = 0;
+            while (isdigit(*str) || *str == '-')
+            {
+                numStr[cnt++] = *str;
+                str++;
+            }
+            while (isspace(*str)) {
+                str++;
+            }
+            if (*str != ',' && *str != '}')
+            {
+                // throw error
+                return 0;
+            }
+            int num = atoi(numStr);
+            tokens[direction].arr[(*index)] = num;
+            (*index)++;
+
+            if(*str != '}') {
+                str++;
+            }
+
+            free(numStr);
+        }
+        if (*str == '}')
+        {
+            (*brace2) = true;
+            break;
+        }
+    }
+    return 1;
+}
+
+void freeArray(ArrayWithSize ** tokens) {
+    for(size_t i = 0; i < 4; i++) {
+            free((*tokens)[i].arr);
+        }
+    free((*tokens));
+}
+
+int main()
+{
+
     ArrayWithSize * tokens = (ArrayWithSize *) malloc(4 * sizeof(*tokens));
     for(size_t i = 0; i < 4; i++) {
         tokens[i].arr = (int *) malloc(sizeof(int) * 10);
@@ -149,3 +221,12 @@ int main() {
     
     // free(tokens);
 }
+
+// helper functions
+void removeNL(char * s) {
+    size_t len = strlen(s);
+    if (len > 0 && s[len-1] == '\n') { 
+        s[len-1] = '\0';
+    }
+}
+
