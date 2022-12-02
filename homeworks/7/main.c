@@ -10,6 +10,10 @@ typedef struct {
     int a;
     int b;
 } twoValue;
+typedef struct {
+    int arr[32];
+    size_t size;
+} tokenArr;
 int maxInt(int a, int b) {
     return (a > b) ? a : b;
 }
@@ -38,23 +42,20 @@ twoValue search(ArrayWithSize * tokens, size_t size, int a, int b, int aTurn) {
         twoValue arr[4];
         int cnt = 0;
         // copy tokens into tmp->
-        ArrayWithSize * tmp;
-
+        tokenArr tmp[4];
         // token will always be size 4 as it has 4 directions;
         for(size_t i = 0; i < 4; i++) {
-            tmp[i].arr = (int *) malloc(sizeof(int) * tokens[i].size);
-            tmp[i].size = tokens[i].size-1;
-            
             for(size_t j = 0; j < tmp[i].size; j++) {
-                tmp[i].arr[j] = tokens[i].arr[j+1];
+                tmp[i].arr[j] = tokens[i].arr[j];
             }
-
+        }
+        for(size_t i = 0; i < 4; i++) {
             if(tokens[i].size != 0) {
-                int current = tokens[i].arr[0]; 
+                int current = tmp[i].arr[0]; 
+                // tmp[i].arr = tmp[i].arr + 1;
                 arr[cnt++] = search(tmp, size - 1, a + current, b, 0);
             }
         }
-
         twoValue maxA = arr[0];
         for(size_t i = 0; i < cnt; i++) {
             if(maxA.a < arr[i].a) {
@@ -68,17 +69,17 @@ twoValue search(ArrayWithSize * tokens, size_t size, int a, int b, int aTurn) {
         
         twoValue arr[4];
         int cnt = 0;
-        ArrayWithSize * tmp;
+        tokenArr tmp[4];
         // token will always be size 4 as it has 4 directions;
         for(size_t i = 0; i < 4; i++) {
-            tmp[i].arr = (int *) malloc(sizeof(int) * tokens[i].size);
-            tmp[i].size = tokens[i].size-1;
-            
             for(size_t j = 0; j < tmp[i].size; j++) {
-                tmp[i].arr[j] = tokens[i].arr[j+1];
+                tmp[i].arr[j] = tokens[i].arr[j];
             }
+        }
+        for(size_t i = 0; i < 4; i++) {
             if(tokens[i].size != 0) {
-                int current = tokens[i].arr[0]; 
+                int current = tmp[i].arr[0]; 
+                &(tmp[i].arr[0])++;
                 arr[cnt++] = search(tmp, size - 1, a , b + current, 1);
             }
         }
