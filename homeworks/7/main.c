@@ -8,6 +8,7 @@ typedef struct
     int *arr;
     int size;
 } ArrayWithSize;
+
 typedef struct
 {
     int a;
@@ -29,12 +30,11 @@ twoValue search(ArrayWithSize * tokens, size_t size, int a, int b, int aTurn, in
     twoValue ab;
     ab.a = a;
     ab.b = b;
-    if(size == 0) {
+    if (size == 0)
+    {
         for(size_t i = 0; i < ansI; i++) {
-            ab.answer[i][0] = answer[i][0];
-            ab.answer[i][1] = answer[i][1];
-
-            printf("%d %d\n", answer[i][0], answer[i][1]);
+            ab.answers[i][0] = answer[i][0];
+            ab.answers[i][1] = answer[i][1];
         }
         return ab;
     }
@@ -365,7 +365,7 @@ int main()
     int a = 0, b = 0;
     for (size_t i = 0; i < tokenSize; i++)
     {
-        // printf("dir: %lu ind: %lu\n", answer[i][0], answer[i][1]);
+        printf("dir: %d ind: %d\n", ab.answers[i][0], ab.answers[i][1]);
         // path check
         if (i % 2 == 0)
         {
@@ -380,6 +380,8 @@ int main()
         printf("%d %d\n", ab.answer[i][0], ab.answer[i][1]);
     }
     printf("Total A/B: %d/%d\n", ab.a, ab.b);
+
+    printf("check path A/B: %d/%d\n", a, b);
 
     for (size_t i = 0; i < tokenSize; i++)
     {
