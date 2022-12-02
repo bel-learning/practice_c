@@ -30,21 +30,27 @@ twoValue search(ArrayWithSize * tokens, size_t size, int a, int b, int aTurn) {
     if(size == 0) {
         printf("Finished searching\n");
         printf("a: %d b: %d\n\n",a,b);
-        ab.a = a;
-        ab.b = b;
+     
         return ab;
         // return 0;
     }
     if(aTurn) {
         twoValue arr[4];
         int cnt = 0;
+        // copy tokens into tmp->
+        ArrayWithSize * tmp;
+
         // token will always be size 4 as it has 4 directions;
         for(size_t i = 0; i < 4; i++) {
+            tmp[i].arr = (int *) malloc(sizeof(int) * tokens[i].size);
+            tmp[i].size = tokens[i].size-1;
+            
+            for(size_t j = 0; j < tmp[i].size; j++) {
+                tmp[i].arr[j] = tokens[i].arr[j+1];
+            }
+
             if(tokens[i].size != 0) {
-                ArrayWithSize * tmp = tokens;
                 int current = tokens[i].arr[0]; 
-                tmp[i].arr = tokens[i].arr + 1;
-                tmp[i].size = tokens[i].size - 1;
                 arr[cnt++] = search(tmp, size - 1, a + current, b, 0);
             }
         }
@@ -55,31 +61,34 @@ twoValue search(ArrayWithSize * tokens, size_t size, int a, int b, int aTurn) {
                 maxA = arr[i];
             }
         }
+        free(tmp);
         return maxA;
     }
     else {
         
         twoValue arr[4];
         int cnt = 0;
+        ArrayWithSize * tmp;
+        // token will always be size 4 as it has 4 directions;
         for(size_t i = 0; i < 4; i++) {
+            tmp[i].arr = (int *) malloc(sizeof(int) * tokens[i].size);
+            tmp[i].size = tokens[i].size-1;
+            
+            for(size_t j = 0; j < tmp[i].size; j++) {
+                tmp[i].arr[j] = tokens[i].arr[j+1];
+            }
             if(tokens[i].size != 0) {
-                ArrayWithSize * tmp = tokens;
                 int current = tokens[i].arr[0]; 
-                tmp[i].arr = tokens[i].arr + 1;
-                tmp[i].size = tokens[i].size - 1;
                 arr[cnt++] = search(tmp, size - 1, a , b + current, 1);
-
             }
         }
-
-
         twoValue maxB = arr[0];
         for(size_t i = 0; i < cnt; i++) {
             if(maxB.b < arr[i].b) {
                 maxB = arr[i];
             }
         }
-   
+        free(tmp);
         return maxB;
     }
 }
@@ -111,8 +120,15 @@ int main() {
     twoValue ab;
     ab = search(tokens, tokenSize, 0, 0, 1);
 
+    
     printf("Operations: %d\n", op);
     printf("last: %d %d\n", ab.a, ab.b);
+    for(size_t i = 0; i < 4; i++) {
+        for(size_t j = 0; j < tokens[i].size; j++) {
+            printf("%d ", tokens[i].arr[j]);
+        }
+        printf("\n");
+    }
     // for(size_t i = 0; i < 10; i++) {
     //     free(tokens[i].arr);
     // }
