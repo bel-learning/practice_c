@@ -8,7 +8,6 @@ typedef struct
     int *arr;
     int size;
 } ArrayWithSize;
-
 typedef struct
 {
     int a;
@@ -32,7 +31,9 @@ twoValue search(ArrayWithSize * tokens, size_t size, int a, int b, int aTurn, in
     ab.b = b;
     if (size == 0)
     {
+        printf("<>\n");
         for(size_t i = 0; i < ansI; i++) {
+            printf("path %lu %lu\n", answer[i][0], answer[i][1]);
             ab.answers[i][0] = answer[i][0];
             ab.answers[i][1] = answer[i][1];
         }
@@ -99,7 +100,6 @@ int insertArray(char **str, bool *colon, bool *brace1, bool *brace2, ArrayWithSi
     (*str)++;
     while (*str)
     {
-        // printf("Stuck: %c\n", **str);
         // printf(">%c<\n", *str);
         while (**str == ' ')
         {
@@ -139,7 +139,7 @@ int insertArray(char **str, bool *colon, bool *brace1, bool *brace2, ArrayWithSi
                 return 0;
             }
             int num = atoi(numStr);
-            // printf("num*Str: %s\n", numStr);
+            // printf("num*Str: %s\n", num*Str);
             // printf("num: %d\n", num);
             tokens[direction].arr[(*index)] = num;
             (*index)++;
@@ -150,11 +150,6 @@ int insertArray(char **str, bool *colon, bool *brace1, bool *brace2, ArrayWithSi
             }
 
             free(numStr);
-        }
-        while (**str == ' ')
-        {
-            (*str)++;
-            continue;
         }
         if (**str == '}')
         {
@@ -208,7 +203,6 @@ int main()
             if (*str == 'N' || *str == 'W' || *str == 'E' || *str == 'S')
             {
                 // read input
-                // printf(">%c<\n", *str);
                 if (*str == 'N')
                 {
                     inN = true;
@@ -309,7 +303,6 @@ int main()
 
         str = NULL;
     }
-    printf("Input ends\n");
     if ((!inN || !inW || !inS || !inE))
     {
         printf("Invalid input.\n");
@@ -337,11 +330,12 @@ int main()
     }
     // [0-3] [index];
 
-    size_t **answer = (size_t **)malloc(tokenSize * sizeof(*answer));
-    for (size_t i = 0; i < tokenSize; i++)
-    {
-        answer[i] = (size_t *)malloc(2 * sizeof(**answer));
-    }
+    // size_t **answer = (size_t **)malloc(tokenSize * sizeof(*answer));
+    // for (size_t i = 0; i < tokenSize; i++)
+    // {
+    //     answer[i] = (size_t *)malloc(2 * sizeof(**answer));
+    // }
+    size_t answer[128][2];
     nIni = tokens[0].size;
     wIni = tokens[1].size;
     eIni = tokens[2].size;
@@ -357,15 +351,14 @@ int main()
     //     printf("\n");
     // }
     ab = search(tokenSize, n, nni, w, wni, e, eni, s, sni, 0, 0, 1, answer, ansI);
-    
     // 3 dim for storing the answer
-    printf("Operations: %d\n", op);
+    // printf("Operations: %d\n", op);
     // printf("last: %d %d\n", ab.a, ab.b);
     char letterMap[] = {'N', 'W', 'E', 'S'};
     int a = 0, b = 0;
     for (size_t i = 0; i < tokenSize; i++)
     {
-        printf("dir: %d ind: %d\n", ab.answers[i][0], ab.answers[i][1]);
+        // printf("dir: %lu ind: %lu\n", answer[i][0], answer[i][1]);
         // path check
         if (i % 2 == 0)
         {
@@ -380,14 +373,9 @@ int main()
         printf("%d %d\n", ab.answer[i][0], ab.answer[i][1]);
     }
     printf("Total A/B: %d/%d\n", ab.a, ab.b);
+    printf("Path check: %d/%d\n", a,b);
 
-    printf("check path A/B: %d/%d\n", a, b);
-
-    for (size_t i = 0; i < tokenSize; i++)
-    {
-        free(answer[i]);
-    }
-    free(answer);
+    
     freeArray(&tokens);
 }
 
