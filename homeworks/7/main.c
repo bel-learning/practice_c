@@ -44,24 +44,26 @@ twoValue search(ArrayWithSize * tokens, size_t size, int a, int b, int aTurn) {
         // copy tokens into tmp->
         tokenArr tmp[4];
         // token will always be size 4 as it has 4 directions;
-        for(size_t i = 0; i < 4; i++) {
-            for(size_t j = 0; j < tmp[i].size; j++) {
-                tmp[i].arr[j] = tokens[i].arr[j];
-            }
-        }
+        // for(size_t i = 0; i < 4; i++) {
+        //     for(size_t j = 0; j < tmp[i].size; j++) {
+        //         tmp[i].arr[j] = tokens[i].arr[j];
+        //     }
+        // }
         for(size_t i = 0; i < 4; i++) {
             if(tokens[i].size != 0) {
-                int current = tmp[i].arr[0]; 
-                // tmp[i].arr = tmp[i].arr + 1;
-                arr[cnt++] = search(tmp, size - 1, a + current, b, 0);
+                tokens[i].size--;
+                tokens[i].arr++;
+                arr[cnt++] = search(tokens, size - 1, a + current, b, 0);
+                tokens[i].size++;
+                tokens[i].arr--;
             }
         }
-        twoValue maxA = arr[0];
-        for(size_t i = 0; i < cnt; i++) {
-            if(maxA.a < arr[i].a) {
-                maxA = arr[i];
-            }
-        }
+        // twoValue maxA = arr[0];
+        // for(size_t i = 0; i < cnt; i++) {
+        //     if(maxA.a < arr[i].a) {
+        //         maxA = arr[i];
+        //     }
+        // }
         free(tmp);
         return maxA;
     }
