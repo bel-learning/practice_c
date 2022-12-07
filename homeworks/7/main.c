@@ -39,6 +39,26 @@ twoValue search(ArrayWithSize * tokens, size_t size, int a, int b, int aTurn, in
         }
         return ab;
     }
+    twoValue ab;
+
+    if (memoExists(memo, tokens, &ab))
+    {
+        // printf("memo exists: firstmover: %d secondmover: %d\n", ab.a, ab.b);
+        // for(size_t i = 0; i < cntl1; i++) {
+        //     printf("dir: %d, index: %d\n", leftOver1[i][0], leftOver1[i][1]);
+        // }
+        if (aTurn)
+        {
+            return ab;
+        }
+        else
+        {
+            int tmp = ab.a;
+            ab.a = ab.b;
+            ab.b = tmp;
+            return ab;
+        }
+    }
     if (aTurn)
     {
         twoValue arr[4];
@@ -88,20 +108,22 @@ twoValue search(ArrayWithSize * tokens, size_t size, int a, int b, int aTurn, in
                 arr[cnt++] = search(tokens, size - 1, a , b + current, 1, answer, ansI+1);
                 tokens[i].size++;
                 tokens[i].arr--;
-                
-                if(cnt == 0) {
+
+                if (cnt == 0)
+                {
                     max = cur;
                 }
-                if(max.b <= cur.b) {
+                if (max.b <= cur.b)
+                {
                     max = cur;
                     max.answers[ansI][0] = i;
-                    max.answers[ansI][1] = initialSizes[i]-tokens[i].size;
+                    max.answers[ansI][1] = initialSizes[i] - tokens[i].size;
                 }
                 cnt++;
-               
             }
         }
-       
+        
+        pushToGlobalArray(memo, tokens, max.b - b, max.a - a);
         return max;
     }
 }
@@ -140,7 +162,8 @@ int insertArray(char **str, bool *colon, bool *brace1, bool *brace2, ArrayWithSi
             continue;
         }
         // printf(">%c<\n", **str);
-        if (!isdigit(**str) && **str != '-') {
+        if (!isdigit(**str) && **str != '-')
+        {
             return 0;
         }
         if (isdigit(**str) || **str == '-')
@@ -166,7 +189,8 @@ int insertArray(char **str, bool *colon, bool *brace1, bool *brace2, ArrayWithSi
             int num = atoi(numStr);
             // printf("num*Str: %s\n", num*Str);
             // printf("num: %d\n", num);
-            if((*index) > 32) {
+            if ((*index) > 32)
+            {
                 return 0;
             }
             tokens[direction].arr[(*index)] = num;
@@ -197,6 +221,9 @@ void freeArray(ArrayWithSize **tokens)
     }
     free((*tokens));
 }
+
+// N -> 0 W -> 1 E -> 2 S -> 3;
+// choices [ [[0,0], [0,1], [1,0]], [[0,0], [0,1], [1,0]], [[0,0], [0,1], [1,0]], [[0,0], [0,1], [1,0]]  ]
 
 int main()
 {
@@ -312,7 +339,8 @@ int main()
                 // printf("outside: >%c<\n", *str);
                 str++;
             }
-            else {
+            else
+            {
                 printf("Invalid input.\n");
                 freeArray(cTokens);
                 return EXIT_FAILURE;
