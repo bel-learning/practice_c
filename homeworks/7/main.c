@@ -189,8 +189,7 @@ int insertArray(char **str, bool *colon, bool *brace1, bool *brace2, ArrayWithSi
             int num = atoi(numStr);
             // printf("num*Str: %s\n", num*Str);
             // printf("num: %d\n", num);
-            if ((*index) > 32)
-            {
+            if((*index) > 32) {
                 return 0;
             }
             tokens[direction].arr[(*index)] = num;
