@@ -58,13 +58,18 @@ twoValue search(ArrayWithSize * tokens, size_t size, int a, int b, int aTurn, in
                 arr[cnt++] = search(tokens, size - 1, a + current, b, 0, answer, ansI+1);
                 tokens[i].size++;
                 tokens[i].arr--;
+                if(cnt == 0) {
+                    max = cur;
+                }
+                if(max.a <= cur.a) {
+                    max = cur;
+                    max.answers[ansI][0] = i;
+                    max.answers[ansI][1] = initialSizes[i]-tokens[i].size;
+                }
+                cnt++;
             }
         }
-        for(size_t i = 0; i < cnt; i++) {
-            if(max.a <= arr[i].a) {
-                max = arr[i];
-            }
-        }
+        
         return max;
     }
     else {
@@ -76,21 +81,27 @@ twoValue search(ArrayWithSize * tokens, size_t size, int a, int b, int aTurn, in
         for(size_t i = 0; i < 4; i++) {
             if(tokens[i].size != 0) {
                 int current = tokens[i].arr[0];
-                answer[ansI][0] = i;
-                answer[ansI][1] = initialSizes[i]-tokens[i].size;
-
+                // answer[ansI][0] = i;
+                // answer[ansI][1] = initialSizes[i]-tokens[i].size;
                 tokens[i].size--;
                 tokens[i].arr++;
                 arr[cnt++] = search(tokens, size - 1, a , b + current, 1, answer, ansI+1);
                 tokens[i].size++;
                 tokens[i].arr--;
+                
+                if(cnt == 0) {
+                    max = cur;
+                }
+                if(max.b <= cur.b) {
+                    max = cur;
+                    max.answers[ansI][0] = i;
+                    max.answers[ansI][1] = initialSizes[i]-tokens[i].size;
+                }
+                cnt++;
+               
             }
         }
-        for(size_t i = 0; i < cnt; i++) {
-            if(max.b <= arr[i].b) {
-                max = arr[i];
-            }
-        }
+       
         return max;
     }
 }
@@ -112,16 +123,30 @@ int insertArray(char **str, bool *colon, bool *brace1, bool *brace2, ArrayWithSi
             (*str)++;
             continue;
         }
+        while (**str == ' ')
+        {
+            (*str)++;
+            continue;
+        }
         if (**str == '{')
         {
             (*brace1) = true;
             (*str)++;
             continue;
         }
+        while (**str == ' ')
+        {
+            (*str)++;
+            continue;
+        }
+        // printf(">%c<\n", **str);
+        if (!isdigit(**str) && **str != '-') {
+            return 0;
+        }
         if (isdigit(**str) || **str == '-')
         {
             // hopefully number won't be higher than 100 digits lmao
-            char *numStr = (char *)malloc(100);
+            char numStr[100];
             int cnt = 0;
             while (isdigit(**str) || **str == '-')
             {
@@ -141,15 +166,19 @@ int insertArray(char **str, bool *colon, bool *brace1, bool *brace2, ArrayWithSi
             int num = atoi(numStr);
             // printf("num*Str: %s\n", num*Str);
             // printf("num: %d\n", num);
+            if((*index) > 32) {
+                return 0;
+            }
             tokens[direction].arr[(*index)] = num;
             (*index)++;
-
+            while (isspace(**str))
+            {
+                (*str)++;
+            }
             if (**str != '}')
             {
                 (*str)++;
             }
-
-            free(numStr);
         }
         if (**str == '}')
         {
@@ -210,14 +239,12 @@ int main()
                     if (insertArray(&str, &colon, &brace1, &brace2, tokens, 0, &ni) == 0)
                     {
                         printf("Invalid input.\n");
-                        free(str);
                         freeArray(cTokens);
                         return EXIT_FAILURE;
                     }
-                    if (!colon || !brace1 || !brace2 || ni > 32)
+                    if (!colon || !brace1 || !brace2)
                     {
                         printf("Invalid input.\n");
-                        free(str);
                         freeArray(cTokens);
                         return EXIT_FAILURE;
                     }
@@ -231,14 +258,12 @@ int main()
                     if (insertArray(&str, &colon, &brace1, &brace2, tokens, 1, &wi) == 0)
                     {
                         printf("Invalid input.\n");
-                        free(str);
                         freeArray(cTokens);
                         return EXIT_FAILURE;
                     };
-                    if (!colon || !brace1 || !brace2 || wi > 32)
+                    if (!colon || !brace1 || !brace2)
                     {
                         printf("Invalid input.\n");
-                        free(str);
                         freeArray(cTokens);
                         return EXIT_FAILURE;
                     }
@@ -253,14 +278,12 @@ int main()
                     if (insertArray(&str, &colon, &brace1, &brace2, tokens, 2, &ei) == 0)
                     {
                         printf("Invalid input.\n");
-                        free(str);
                         freeArray(cTokens);
                         return EXIT_FAILURE;
                     };
-                    if (!colon || !brace1 || !brace2 || ei > 32)
+                    if (!colon || !brace1 || !brace2)
                     {
                         printf("Invalid input.\n");
-                        free(str);
                         freeArray(cTokens);
                         return EXIT_FAILURE;
                     }
@@ -274,15 +297,13 @@ int main()
                     if (insertArray(&str, &colon, &brace1, &brace2, tokens, 3, &si) == 0)
                     {
                         printf("Invalid input.\n");
-                        free(str);
                         freeArray(cTokens);
                         return EXIT_FAILURE;
                     };
-                    if (!colon || !brace1 || !brace2 || si > 32)
+                    if (!colon || !brace1 || !brace2)
                     {
                         printf("Invalid input.\n");
-                        free(str);
-                        freeArray(&tokens);
+                        freeArray(cTokens);
                         return EXIT_FAILURE;
                     }
                     tokens[3].size = si;
@@ -290,6 +311,11 @@ int main()
                 }
                 // printf("outside: >%c<\n", *str);
                 str++;
+            }
+            else {
+                printf("Invalid input.\n");
+                freeArray(cTokens);
+                return EXIT_FAILURE;
             }
             // else
             // {
@@ -306,7 +332,6 @@ int main()
     if ((!inN || !inW || !inS || !inE))
     {
         printf("Invalid input.\n");
-        free(str);
         freeArray(cTokens);
         return EXIT_FAILURE;
     }
