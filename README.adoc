@@ -1,6 +1,0 @@
-# BIE-PA1 repository
-
-Hello student,
-this is your official repository for https://courses.fit.cvut.cz/BIE-PA1/[BIE-PA1]. The repository has been generated automatically generated and it is recommended to use it actively (e.g. for versioning your homeworks). The structure of the repository is up to you, we recommend following https://courses.fit.cvut.cz/BIE-GIT/pa1.html[the information in the BIE-GIT course], especially if you are enrolled in this course this semester.
-
-If you are not sure how to work with Git, you can refer to https://courses.fit.cvut.cz/BIE-GIT/[BIE-GIT] course materials.
